@@ -38,3 +38,11 @@ def resumo(transacoes):
     saldo = receitas - despesas
 
     return receitas, despesas, saldo
+
+
+def filtrar_categoria(transacoes, categoria):
+
+    return [
+        t for t in transacoes 
+        if t["categoria"].lower() == categoria.lower()
+    ]

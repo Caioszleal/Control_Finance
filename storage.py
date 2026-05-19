@@ -1,12 +1,15 @@
 import json
 import os
 
-ARQUIVO = "dados.json"
+ARQUIVO = os.path.join(os.path.dirname(__file__), "dados.json")
 
 def carregar():
     if os.path.exists(ARQUIVO):
-        with open(ARQUIVO, "r") as f:
-            return json.load(f)
+        try:
+            with open(ARQUIVO, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            return []
     return []
 
 def salvar(transacoes):

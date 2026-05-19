@@ -1,10 +1,12 @@
 from finance import (
     nova_transacao,
     calcular_saldo,
-    resumo
+    resumo,
+    filtrar_categoria
 )
 
 from storage import carregar, salvar
+from exporter import exportar_csv
 
 transacoes = carregar()
 
@@ -16,6 +18,8 @@ while True:
     print("3 - Ver transações")
     print("4 - Ver saldo")
     print("5 - Ver resumo")
+    print("6 - Filtrar categoria")
+    print("7 - Exportar CSV")
     print("0 - Sair")
 
     opcao = input("Escolha: ")
@@ -88,6 +92,29 @@ while True:
         print(f"Receitas: R${receitas}")
         print(f"Despesas: R${despesas}")
         print(f"Saldo: R${saldo}")
+
+    # FILTRAR CATEGORIA
+    elif opcao == "6":
+
+        categoria = input("Categoria: ")
+        filtradas = filtrar_categoria(
+            transacoes, categoria
+        )
+
+        print(f"\n===== FILTRADAS =====")
+
+        for t in filtradas:
+            simbolo = "+" if t["tipo"] == "receita" else "-"
+            print(
+                f"{t['data']} | "
+                f"{simbolo} R${t['valor']} | "
+                f"{t['descricao']}"
+            )
+
+    # EXPORTAR CSV
+    elif opcao == "7":
+
+        exportar_csv(transacoes)
 
     elif opcao == "0":
         break
