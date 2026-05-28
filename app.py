@@ -5,62 +5,65 @@ from finance import (
     calcular_saldo
 )
 
-from storage import (
-    carregar, 
-    salvar
+from database import (
+    criar_tabela,
+    inserir_transacao,
+    listar_transacoes
 )
 
 app = Flask(__name__)
 
-transacoes = carregar()
+# cria tabela ao iniciar
+criar_tabela()
 
-#---------------------
+# -------------------------
 # HOME
-#---------------------
+# -------------------------
 @app.route("/")
 def home():
 
     return {
-        "mensagem": "API Fincanceira Online 🚀"
+        "mensagem": "API Financeira SQLite 🚀"
     }
 
-#---------------------
-# LISTAR TRANSACOES
-#---------------------
+# -------------------------
+# LISTAR TRANSAÇÕES
+# -------------------------
 @app.route("/transacoes", methods=["GET"])
-def listar_transacoes():
+def transacoes():
 
-    return jsonify(transacoes)
+    dados = listar_transacoes()
 
-#---------------------
-# ADICIONAR TRANSACAO
-#---------------------
+    return jsonify(dados)
+
+# -------------------------
+# ADICIONAR TRANSAÇÃO
+# -------------------------
 @app.route("/transacoes", methods=["POST"])
-def adicionar_transacao():
+def adicionar():
 
     dados = request.json
 
     nova = nova_transacao(
         dados["tipo"],
         dados["valor"],
-        dados["descricao"]
-        ,dados["categoria"]
+        dados["descricao"],
+        dados["categoria"]
     )
 
-    transacoes.append(nova)
-
-    salvar(transacoes)
+    inserir_transacao(nova)
 
     return jsonify({
-        "mensagem": "Transação adicionada com sucesso!",
-        "transacao": nova
+        "mensagem": "Transação salva no banco!"
     })
 
-#---------------------
+# -------------------------
 # SALDO
-#---------------------
+# -------------------------
 @app.route("/saldo", methods=["GET"])
 def saldo():
+
+    transacoes = listar_transacoes()
 
     total = calcular_saldo(transacoes)
 
@@ -68,10 +71,9 @@ def saldo():
         "saldo": total
     })
 
-#---------------------
-# RODAR SERVIDOR
-#---------------------
+# -------------------------
+# START
+# -------------------------
 if __name__ == "__main__":
 
     app.run(debug=True)
-    

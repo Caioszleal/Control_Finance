@@ -22,27 +22,3 @@ def calcular_saldo(transacoes):
             saldo -= t["valor"]
 
     return saldo
-
-def resumo(transacoes):
-
-    receitas = 0
-    despesas = 0
-
-    for t in transacoes:
-
-        if t["tipo"] == "receita":
-            receitas += t["valor"]
-        else:
-            despesas += t["valor"]
-
-    saldo = receitas - despesas
-
-    return receitas, despesas, saldo
-
-
-def filtrar_categoria(transacoes, categoria):
-
-    return [
-        t for t in transacoes 
-        if t["categoria"].lower() == categoria.lower()
-    ]
