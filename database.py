@@ -99,3 +99,104 @@ def listar_transacoes():
         })
 
     return transacoes
+
+# -------------------------
+# BUSCAR
+def buscar_transacao_por_id(id_transacao):
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            tipo,
+            valor,
+            descricao,
+            categoria,
+            data
+        FROM transacoes
+        WHERE id = ?
+    """, (id_transacao,))
+
+    linha = cursor.fetchone()
+    conn.close()
+
+    if not linha:
+        return None
+
+    return {
+        "id": linha[0],
+        "tipo": linha[1],
+        "valor": linha[2],
+        "descricao": linha[3],
+        "categoria": linha[4],
+        "data": linha[5]
+    }
+
+# -------------------------
+# ATUALIZAR
+# -------------------------
+def atualizar_transacao(id_transacao, dados):
+
+    transacao_atual = buscar_transacao_por_id(id_transacao)
+
+    if not transacao_atual:
+        return False
+
+    tipo = dados.get("tipo", transacao_atual["tipo"])
+    valor = dados.get("valor", transacao_atual["valor"])
+    descricao = dados.get("descricao", transacao_atual["descricao"])
+    categoria = dados.get("categoria", transacao_atual["categoria"])
+    data = dados.get("data", transacao_atual["data"])
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE transacoes
+        SET
+            tipo = ?,
+            valor = ?,
+            descricao = ?,
+            categoria = ?,
+            data = ?
+        WHERE id = ?
+    """, (
+        tipo,
+        valor,
+        descricao,
+        categoria,
+        data,
+        id_transacao
+    ))
+
+    conn.commit()
+
+    linhas_afetadas = cursor.rowcount
+
+    conn.close()
+
+    return linhas_afetadas > 0
+
+
+# -------------------------
+# DELETAR
+# -------------------------
+def deletar_transacao(id_transacao):
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM transacoes
+        WHERE id = ?
+    """, (id_transacao,))
+
+    conn.commit()
+
+    linhas_afetadas = cursor.rowcount
+
+    conn.close()
+
+    return linhas_afetadas > 0

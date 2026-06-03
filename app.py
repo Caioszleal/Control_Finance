@@ -8,7 +8,9 @@ from finance import (
 from database import (
     criar_tabela,
     inserir_transacao,
-    listar_transacoes
+    listar_transacoes,
+    atualizar_transacao,
+    deletar_transacao
 )
 
 app = Flask(__name__)
@@ -55,6 +57,48 @@ def adicionar():
 
     return jsonify({
         "mensagem": "Transação salva no banco!"
+    })
+
+# -------------------------
+# ATUALIZAR TRANSAÇÃO
+# -------------------------
+
+@app.route("/transacoes/<int:id>", methods=["PUT", "PATCH"])
+def atualizar(id):
+
+    dados = request.get_json(silent=True)
+
+    if dados is None:
+        return jsonify({
+            "mensagem": "Requisição inválida. Envie JSON com os campos da transação."
+        }), 400
+
+    sucesso = atualizar_transacao(id, dados)
+
+    if not sucesso:
+        return jsonify({
+            "mensagem": "Transação não encontrada!"
+        }), 404
+    
+    return jsonify({
+        "mensagem": "Transação atualizada com sucesso!"
+    })
+
+# -------------------------
+# DELETAR TRANSAÇÃO
+# -------------------------
+@app.route("/transacoes/<int:id>", methods=["DELETE"])
+def deletar(id):
+
+    sucesso = deletar_transacao(id)
+
+    if not sucesso:
+        return jsonify({
+            "mensagem": "Transação não encontrada!"
+        }), 404
+
+    return jsonify({
+        "mensagem": "Transação removida com sucesso!"
     })
 
 # -------------------------
