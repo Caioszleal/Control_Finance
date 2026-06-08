@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 
+from validators import validar_transacao
+
 from finance import (
     nova_transacao,
     calcular_saldo
@@ -10,7 +12,8 @@ from database import (
     inserir_transacao,
     listar_transacoes,
     atualizar_transacao,
-    deletar_transacao
+    deletar_transacao,
+    buscar_transacao_por_id
 )
 
 app = Flask(__name__)
@@ -46,6 +49,11 @@ def adicionar():
 
     dados = request.json
 
+    erros = validar_transacao(dados)
+
+    if erros:
+        return jsonify({"erros": erros}), 400
+
     nova = nova_transacao(
         dados["tipo"],
         dados["valor"],
@@ -72,6 +80,11 @@ def atualizar(id):
         return jsonify({
             "mensagem": "Requisição inválida. Envie JSON com os campos da transação."
         }), 400
+
+    erros = validar_transacao(dados)
+
+    if erros:
+        return jsonify({"erros": erros}), 400
 
     sucesso = atualizar_transacao(id, dados)
 
@@ -114,6 +127,21 @@ def saldo():
     return jsonify({
         "saldo": total
     })
+
+# -------------------------
+# BUSCAR TRANSAÇÃO POR ID
+# -------------------------
+@app.route("/transacoes/<int:id>", methods=["GET"])
+def buscar(id):
+
+    transacao = buscar_transacao_por_id(id)
+
+    if transacao is None:
+        return jsonify({
+            "erro": "Transação não encontrada!"
+        }), 404
+
+    return jsonify(transacao)
 
 # -------------------------
 # START

@@ -119,19 +119,19 @@ def buscar_transacao_por_id(id_transacao):
         WHERE id = ?
     """, (id_transacao,))
 
-    linha = cursor.fetchone()
+    resultado = cursor.fetchone()
     conn.close()
 
-    if not linha:
+    if resultado is None:
         return None
 
     return {
-        "id": linha[0],
-        "tipo": linha[1],
-        "valor": linha[2],
-        "descricao": linha[3],
-        "categoria": linha[4],
-        "data": linha[5]
+        "id": resultado[0],
+        "tipo": resultado[1],
+        "valor": resultado[2],
+        "descricao": resultado[3],
+        "categoria": resultado[4],
+        "data": resultado[5]
     }
 
 # -------------------------
